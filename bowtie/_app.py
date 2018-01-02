@@ -623,7 +623,7 @@ class App:
             A Bowtie widget instance.
 
         """
-        self.root.add(widget)
+        self._root.add(widget)
 
     def add_sidebar(self, widget: Component) -> None:
         """Add a widget to the sidebar.
@@ -634,7 +634,7 @@ class App:
             Add this widget to the sidebar, it will be appended to the end.
 
         """
-        self.root.add_sidebar(widget)
+        self._root.add_sidebar(widget)
 
     def add_route(self, view, path, exact=True):
         """Add a view to the app.
@@ -647,9 +647,9 @@ class App:
 
         """
         assert path[0] == '/'
-        for route in self.routes:
+        for route in self._routes:
             assert path != route.path, 'Cannot use the same path twice'
-        self.routes.append(Route(view=view, path=path, exact=exact))
+        self._routes.append(Route(view=view, path=path, exact=exact))
 
     def respond(self, pager: Pager, func: Callable) -> None:
         """Call a function in response to a page.
@@ -677,7 +677,7 @@ class App:
         >>> app.respond(pager, callback)
 
         """
-        self.pages[pager] = func.__name__
+        self._pages[pager] = func.__name__
 
     def subscribe(self, func: Callable, event: Event, *events: Event) -> None:
         """Call a function in response to an event.
@@ -728,10 +728,10 @@ class App:
                          func2=func.__name__,
                          obj=COMPONENT_REGISTRY[event.uuid]
                      ), Warning)
-            self.uploads[event.uuid] = func.__name__
+            self._uploads[event.uuid] = func.__name__
 
         for evt in all_events:
-            self.subscriptions[evt].append((all_events, func.__name__))
+            self._subscriptions[evt].append((all_events, func.__name__))
 
     def listen(self, event: Event, *events: Event) -> Callable:
         """Call a function in response to an event.
@@ -791,7 +791,7 @@ class App:
             Function to be called.
 
         """
-        self.schedules.append(_Schedule(seconds, func.__name__))
+        self._schedules.append(_Schedule(seconds, func.__name__))
 
     def _sourcefile(self):  # pylint: disable=no-self-use
         # [-1] grabs the top of the stack
@@ -815,21 +815,21 @@ class App:
         with open(server_path, 'w') as f:
             f.write(
                 server.render(
-                    socketio=self.socketio,
+                    socketio=self._socketio,
                     basic_auth=self._basic_auth,
-                    username=self.username,
-                    password=self.password,
+                    username=self._username,
+                    password=self._password,
                     notebook=notebook,
                     source_module=self._sourcefile() if not notebook else None,
-                    subscriptions=self.subscriptions,
-                    uploads=self.uploads,
-                    schedules=self.schedules,
-                    initial=self.init,
-                    routes=self.routes,
-                    pages=self.pages,
-                    host="'{}'".format(self.host),
-                    port=self.port,
-                    debug=self.debug
+                    subscriptions=self._subscriptions,
+                    uploads=self._uploads,
+                    schedules=self._schedules,
+                    initial=self._init,
+                    routes=self._routes,
+                    pages=self._pages,
+                    host="'{}'".format(self._host),
+                    port=self._port,
+                    debug=self._debug
                 )
             )
 
@@ -840,20 +840,20 @@ class App:
         shutil.copy(template_src, app)
         template_src = os.path.join(self._package_dir, 'src', 'utils.js')
         shutil.copy(template_src, app)
-        for route in self.routes:
+        for route in self._routes:
             for template in route.view.templates:
                 template_src = os.path.join(self._package_dir, 'src', template)
                 shutil.copy(template_src, app)
 
         packages = set()  # type: Set[str]
-        for route in self.routes:
+        for route in self._routes:
             route.view._render(app, self._jinjaenv)  # pylint: disable=protected-access
             packages |= route.view.packages
 
         with open(os.path.join(templates, indexhtml.name[:-3]), 'w') as f:  # type: ignore
             f.write(
                 indexhtml.render(
-                    title=self.title,
+                    title=self._title,
                 )
             )
 
@@ -861,9 +861,9 @@ class App:
             f.write(
                 indexjsx.render(
                     maxviewid=View._NEXT_UUID,  # pylint: disable=protected-access
-                    socketio=self.socketio,
-                    pages=self.pages,
-                    routes=self.routes
+                    socketio=self._socketio,
+                    pages=self._pages,
+                    routes=self._routes
                 )
             )
         return packages
@@ -900,7 +900,6 @@ class App:
                     print('Yarn error but trying to continue build')
         retval = run([_WEBPACK, '--config', 'webpack.dev.js'], notebook=notebook)
         if retval != 0:
-            raise WebpackError('Error building with webpack')
 
 
 def run(command: List[str], notebook: None = None) -> int:
