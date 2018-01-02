@@ -279,20 +279,33 @@ class View:
 
     def __init__(self, rows: int = 1, columns: int = 1, sidebar: bool = True,
                  background_color: str = 'White') -> None:
-        """Create a new grid."""
+        """Create a new grid.
+
+        Parameters
+        ----------
+        rows : int, optional
+            Number of rows in the grid.
+        columns : int, optional
+            Number of columns in the grid.
+        sidebar : bool, optional
+            Enable a sidebar for control widgets.
+        background_color : str, optional
+            Background color of the control pane.
+
+        """
         self._uuid = View._next_uuid()
-        self.used = OrderedDict(((key, False) for key in product(range(rows), range(columns))))
+        self._used = OrderedDict(((key, False) for key in product(range(rows), range(columns))))
         self.column_gap = Gap()
         self.row_gap = Gap()
         self.rows = [Size() for _ in range(rows)]
         self.columns = [Size() for _ in range(columns)]
         self.sidebar = sidebar
         self.background_color = background_color
-        self.packages = set()  # type: Set[str]
-        self.templates = set()  # type: Set[str]
-        self.imports = set()  # type: Set[_Import]
-        self.controllers = []  # type: List[_Control]
-        self.spans = defaultdict(Widgets)  # type: Dict[Span, List[Component]]
+        self._packages = set()  # type: Set[str]
+        self._templates = set()  # type: Set[str]
+        self._imports = set()  # type: Set[_Import]
+        self._controllers = []  # type: List[_Control]
+        self._spans = defaultdict(Widgets)  # type: Dict[Span, List[Component]]
 
     @property
     def _name(self) -> str:
@@ -399,10 +412,10 @@ class View:
                                  .format(column_start, column_end))
 
         # pylint: disable=protected-access
-        self.packages.add(widget._PACKAGE)
-        self.templates.add(widget._TEMPLATE)
-        self.imports.add(_Import(component=widget._COMPONENT,
-                                 module=widget._TEMPLATE[:widget._TEMPLATE.find('.')]))
+        self._packages.add(widget._PACKAGE)
+        self._templates.add(widget._TEMPLATE)
+        self._imports.add(_Import(component=widget._COMPONENT,
+                                  module=widget._TEMPLATE[:widget._TEMPLATE.find('.')]))
 
         used_msg = 'Cell at [{}, {}] is already used.'
         if row_start is None or column_start is None:
@@ -422,18 +435,18 @@ class View:
                     'specify both row_start and column_start.'
                 )
             row, col = None, None
-            for (row, col), use in self.used.items():
+            for (row, col), use in self._used.items():
                 if not use:
                     break
             else:
                 raise NoUnusedCellsError()
             span = Span(row, col)
-            self.used[row, col] = True
+            self._used[row, col] = True
         elif row_end is None and column_end is None:
-            if self.used[row_start, column_start]:
+            if self._used[row_start, column_start]:
                 raise UsedCellsError(used_msg.format(row_start, column_start))
             span = Span(row_start, column_start)
-            self.used[row_start, column_start] = True
+            self._used[row_start, column_start] = True
         else:
             if row_end is None:
                 row_end = row_start + 1
@@ -442,15 +455,15 @@ class View:
 
             for row, col in product(range(row_start, row_end),
                                     range(column_start, column_end)):
-                if self.used[row, col]:
+                if self._used[row, col]:
                     raise UsedCellsError(used_msg.format(row, col))
 
             for row, col in product(range(row_start, row_end),
                                     range(column_start, column_end)):
-                self.used[row, col] = True
+                self._used[row, col] = True
             span = Span(row_start, column_start, row_end, column_end)
 
-        self.spans[span].append(widget)
+        self._spans[span].append(widget)
 
     def add_sidebar(self, widget: Component) -> None:
         """Add a widget to the sidebar.
@@ -467,12 +480,12 @@ class View:
         assert isinstance(widget, Component)
 
         # pylint: disable=protected-access
-        self.packages.add(widget._PACKAGE)
-        self.templates.add(widget._TEMPLATE)
-        self.imports.add(_Import(component=widget._COMPONENT,
-                                 module=widget._TEMPLATE[:widget._TEMPLATE.find('.')]))
-        self.controllers.append(_Control(instantiate=widget._instantiate,
-                                         caption=getattr(widget, 'caption', None)))
+        self._packages.add(widget._PACKAGE)
+        self._templates.add(widget._TEMPLATE)
+        self._imports.add(_Import(component=widget._COMPONENT,
+                                  module=widget._TEMPLATE[:widget._TEMPLATE.find('.')]))
+        self._controllers.append(_Control(instantiate=widget._instantiate,
+                                          caption=getattr(widget, 'caption', None)))
 
     def _render(self, path: str, env: Environment) -> None:
         """TODO: Docstring for _render.
@@ -503,9 +516,9 @@ class View:
                     column_gap=self.column_gap,
                     row_gap=self.row_gap,
                     background_color=self.background_color,
-                    components=self.imports,
-                    controls=self.controllers,
-                    spans=self.spans
+                    components=self._imports,
+                    controls=self._controllers,
+                    spans=self._spans
                 )
             )
 
@@ -554,24 +567,23 @@ class App:
             Enable debugging in Flask. Disable in production!
 
         """
-        self.background_color = background_color
-        self.basic_auth = basic_auth
-        self.debug = debug
-        self.host = host
-        self.init = None
-        self.password = password
-        self.port = port
-        self.socketio = socketio
-        self.schedules = []  # type: List[_Schedule]
-        self.subscriptions = defaultdict(list)  # type: Dict[Event, List[Tuple[List[Event], str]]]
-        self.pages = {}  # type: Dict[Pager, str]
-        self.title = title
-        self.username = username
-        self.uploads = {}  # type: Dict[int, str]
+        self._basic_auth = basic_auth
+        self._debug = debug
+        self._host = host
+        self._init = None
+        self._password = password
+        self._port = port
+        self._socketio = socketio
+        self._schedules = []  # type: List[_Schedule]
+        self._subscriptions = defaultdict(list)  # type: Dict[Event, List[Tuple[List[Event], str]]]
+        self._pages = {}  # type: Dict[Pager, str]
+        self._title = title
+        self._username = username
+        self._uploads = {}  # type: Dict[int, str]
         self.theme = theme
-        self.root = View(rows=rows, columns=columns, sidebar=sidebar,
-                         background_color=background_color)
-        self.routes = [Route(view=self.root, path='/', exact=True)]
+        self._root = View(rows=rows, columns=columns, sidebar=sidebar,
+                          background_color=background_color)
+        self._routes = [Route(view=self.root, path='/', exact=True)]
         self._package_dir = os.path.dirname(__file__)
         self._jinjaenv = Environment(
             loader=FileSystemLoader(os.path.join(self._package_dir, 'templates')),
@@ -766,7 +778,7 @@ class App:
             Function to be called.
 
         """
-        self.init = func.__name__
+        self._init = func.__name__
 
     def schedule(self, seconds, func):
         """Call a function periodically.
@@ -804,7 +816,7 @@ class App:
             f.write(
                 server.render(
                     socketio=self.socketio,
-                    basic_auth=self.basic_auth,
+                    basic_auth=self._basic_auth,
                     username=self.username,
                     password=self.password,
                     notebook=notebook,
