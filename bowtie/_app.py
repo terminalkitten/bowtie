@@ -720,11 +720,11 @@ class App:
                     raise NotStatefulEvent(msg.format(evt.uuid, evt.name))
 
         if event.name == 'upload':
-            if event.uuid in self.uploads:
+            if event.uuid in self._uploads:
                 warnings.warn(
                     ('Overwriting function "{func1}" with function '
                      '"{func2}" for upload object "{obj}".').format(
-                         func1=self.uploads[event.uuid],
+                         func1=self._uploads[event.uuid],
                          func2=func.__name__,
                          obj=COMPONENT_REGISTRY[event.uuid]
                      ), Warning)
