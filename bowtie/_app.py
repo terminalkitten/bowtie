@@ -849,7 +849,7 @@ class App:
         packages = set()  # type: Set[str]
         for route in self._routes:
             route.view._render(app, self._jinjaenv)  # pylint: disable=protected-access
-            packages |= route.view.packages
+            packages |= route.view._packages  # pylint: disable=protected-access
 
         with open(os.path.join(templates, indexhtml.name[:-3]), 'w') as f:  # type: ignore
             f.write(

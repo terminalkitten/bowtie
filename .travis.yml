@@ -29,7 +29,9 @@ install:
   - google-chrome --version
   - google-chrome-stable --version
   - sudo apt-get update 
-  - sudo apt-get install xvfb libenchant1c2a yarn
+  - sudo apt-get install xvfb libenchant1c2a
+  - sudo apt-get install yarn
+  - yarn --version
   - yarn global add eslint babel-eslint eslint-plugin-react
   - make eslint
   - export PATH="$HOME/miniconda/bin:$PATH"
