@@ -4,7 +4,7 @@ cache:
   pip: true
   yarn: true
   directories:
-    - miniconda
+    - ~/miniconda
 addons:
   chrome:
     stable
