@@ -27,8 +27,7 @@ install:
   - sudo apt-get update 
   - yarn global add eslint babel-eslint eslint-plugin-react
   - make eslint
-  - sudo apt-get install xvfb
-  - sudo apt-get install libenchant1c2a
+  - sudo apt-get install xvfb libenchant1c2a
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
@@ -40,10 +39,7 @@ install:
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
   - source activate test-environment
   - pip install -U pip
-  - pip install -r test-requirements.txt
-  - if [[ "$TRAVIS_PYTHON_VERSION" == "3.6" ]]; then
-    pip install pytest-codestyle;
-    fi
+  - pip install -r test-requirements.txt --progress-bar=off
   - wget https://chromedriver.storage.googleapis.com/2.36/chromedriver_linux64.zip
   - unzip chromedriver_linux64.zip
   - chmod +x chromedriver
@@ -54,9 +50,6 @@ install:
 script:
   - cd doc && make spelling && cd ..
   - ./vale --glob='*.rst' doc
-  - if [[ "$TRAVIS_PYTHON_VERSION" == "3.6" ]]; then
-    make style;
-    fi
   - make checkdocs
   - make static
   - make test

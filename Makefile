@@ -3,16 +3,16 @@
 all: test
 
 test:
-	py.test --cov=./ --pylint --pylint-rcfile=pylintrc --pylint-error-types=RCWEF --ignore=doc
+	py.test --cov=./ --codestyle --pylint --pylint-rcfile=pylintrc --pylint-error-types=RCWEF --ignore=doc --ignore=bowtie/src/node_modules
 
 unit:
 	py.test --cov=./
 
 lint:
-	py.test --pylint -m pylint --pylint-rcfile=pylintrc --pylint-error-types=RCWEF --ignore=doc
+	py.test --pylint -m pylint --pylint-rcfile=pylintrc --pylint-error-types=RCWEF --ignore=doc --ignore=bowtie/src/node_modules
 
 style:
-	py.test --codestyle -m codestyle --ignore=doc
+	py.test --codestyle -m codestyle --ignore=doc --ignore=bowtie/src/node_modules
 
 eslint:
 	eslint bowtie/src/*.js{,x}
