@@ -901,6 +901,7 @@ class App:
                     print('Yarn error but trying to continue build')
         retval = run([_WEBPACK, '--config', 'webpack.dev.js'], notebook=notebook)
         if retval != 0:
+            raise WebpackError('Error building with webpack')
 
 
 def run(command: List[str], notebook: None = None) -> int:
