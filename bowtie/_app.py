@@ -583,7 +583,7 @@ class App:
         self.theme = theme
         self._root = View(rows=rows, columns=columns, sidebar=sidebar,
                           background_color=background_color)
-        self._routes = [Route(view=self.root, path='/', exact=True)]
+        self._routes = [Route(view=self._root, path='/', exact=True)]
         self._package_dir = os.path.dirname(__file__)
         self._jinjaenv = Environment(
             loader=FileSystemLoader(os.path.join(self._package_dir, 'templates')),
@@ -606,11 +606,11 @@ class App:
 
     def __getitem__(self, key):
         """Get item from root view."""
-        return self.root.__getitem__(key)
+        return self._root.__getitem__(key)
 
     def __setitem__(self, key: Any, value: Component) -> None:
         """Add widget to the root view."""
-        self.root.__setitem__(key, value)
+        self._root.__setitem__(key, value)
 
     def add(self, widget: Component) -> None:
         """Add a widget to the grid in the next available cell.
