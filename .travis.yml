@@ -32,11 +32,12 @@ install:
   - yarn global add eslint babel-eslint eslint-plugin-react
   - make eslint
   - sudo apt-get install xvfb libenchant1c2a
-  - if [ ! -d $HOME/miniconda ]; then
+  - mkdir $HOME/miniconda/bin
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - if !hash conda 2>/dev/null; then
     wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
     bash miniconda.sh -b -p $HOME/miniconda;
     fi
-  - export PATH="$HOME/miniconda/bin:$PATH"
   - hash -r
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
