@@ -34,7 +34,6 @@ install:
   - sudo apt-get install xvfb libenchant1c2a
   - mkdir $HOME/miniconda/bin
   - export PATH="$HOME/miniconda/bin:$PATH"
-  - which conda
   - hash conda
   - type conda
   - if !hash conda 2>/dev/null; then
