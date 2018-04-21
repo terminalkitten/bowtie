@@ -42,9 +42,9 @@ install:
   - conda info -a
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
   - source activate test-environment
-  - pip install -U pip
+  - pip install --upgrade pip
   - pip install -r test-requirements.txt --progress-bar=off
-  - pip install git+https://github.com/henry0312/pytest-codestyle.git
+  - pip install --upgrade git+https://github.com/henry0312/pytest-codestyle.git
   - wget https://chromedriver.storage.googleapis.com/2.36/chromedriver_linux64.zip
   - unzip chromedriver_linux64.zip
   - chmod +x chromedriver
