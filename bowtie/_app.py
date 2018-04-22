@@ -487,6 +487,14 @@ class View:
         self._controllers.append(_Control(instantiate=widget._instantiate,
                                           caption=getattr(widget, 'caption', None)))
 
+    @property
+    def _columns_sidebar(self):
+        columns = []
+        if self.sidebar:
+            columns.append(Size().ems(18))
+        columns += self.columns
+        return columns
+
     def _render(self, path: str, env: Environment) -> None:
         """TODO: Docstring for _render.
 
@@ -511,10 +519,6 @@ class View:
                 jsx.render(
                     uuid=self._uuid,
                     sidebar=self.sidebar,
-                    columns=columns,
-                    rows=self.rows,
-                    column_gap=self.column_gap,
-                    row_gap=self.row_gap,
                     background_color=self.background_color,
                     components=self._imports,
                     controls=self._controllers,
