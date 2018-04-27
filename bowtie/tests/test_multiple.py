@@ -72,6 +72,7 @@ def test_multiple(multiple_views, chrome_driver):
 
     button = chrome_driver.find_element_by_class_name('ant-btn')
     button.click()
+    chrome_driver.implicitly_wait(1)
 
     data = chrome_driver.find_element_by_class_name('ant-table-body').text
 
