@@ -312,7 +312,7 @@ class View:
         return 'view{}.jsx'.format(self._uuid)
 
     def _key_to_rows_columns(self, key: Any) -> Tuple[int, int, int, int]:
-        # FIXME spaghetti code cleanup needed!
+        # TODO spaghetti code cleanup needed!
         if isinstance(key, tuple):
             if len(key) == 1:
                 rows_cols = self._key_to_rows_columns(key[0])
@@ -650,7 +650,8 @@ class App:
         exact : bool, optional
 
         """
-        assert path[0] == '/'
+        if path[0] != '/':
+            path = '/' + path
         for route in self._routes:
             assert path != route.path, 'Cannot use the same path twice'
         self._routes.append(Route(view=view, path=path, exact=exact))
@@ -889,7 +890,7 @@ class App:
             webpackdev = os.path.join(self._package_dir, 'src/webpack.dev.js')
             shutil.copy(webpackdev, _DIRECTORY)
 
-        if run(['yarn', 'install'], notebook=notebook) > 1:
+        if run(['yarn', '--ignore-engines', 'install'], notebook=notebook) > 1:
             raise YarnError('Error installing node packages')
 
         packages.discard(None)
@@ -898,7 +899,7 @@ class App:
             new_packages = [x for x in packages if x.split('@')[0] not in installed]
 
             if new_packages:
-                retval = run(['yarn', 'add'] + new_packages, notebook=notebook)
+                retval = run(['yarn', '--ignore-engines', 'add'] + new_packages, notebook=notebook)
                 if retval > 1:
                     raise YarnError('Error installing node packages')
                 elif retval == 1:
