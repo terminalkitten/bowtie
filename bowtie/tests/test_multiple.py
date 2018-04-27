@@ -96,4 +96,3 @@ def test_multiple(multiple_views, chrome_driver):
 
     chrome_driver.get('http://localhost:9991/view1')
     assert chrome_driver.title == '404 Not Found'
-
