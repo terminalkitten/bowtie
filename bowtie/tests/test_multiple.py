@@ -41,6 +41,7 @@ def multiple_views(build_path, monkeypatch):
 
     app = App()
     view1 = View()  # pylint: disable=unused-variable
+    assert view1._uuid == 2
     view2 = View()
     view2.add(table)
     app.add_route(view2, 'view2')
