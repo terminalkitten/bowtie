@@ -37,3 +37,6 @@ monkeytype:
 
 outdated:
 	cd bowtie/src && yarn --ignore-engines install && yarn outdated
+
+travis:
+	docker build -f Dockertravis -t travis .
